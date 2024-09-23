@@ -7,7 +7,7 @@ import EmptyNote from "@/components/empty-note";
 
 import { useEffect, useState } from "react";
 import { supabase } from "@/utils/supabase";
-import { Database } from "@/utils/supabase";
+import { Database } from "@/types_db";
 
 export default function UI() {
   const [activeNoteId, setActiveNoteId] = useState(null);
