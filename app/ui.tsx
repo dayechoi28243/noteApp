@@ -7,13 +7,14 @@ import EmptyNote from "@/components/empty-note";
 
 import { useEffect, useState } from "react";
 import { supabase } from "@/utils/supabase";
+import { Database } from "@/utils/supabase";
 
 export default function UI() {
   const [activeNoteId, setActiveNoteId] = useState(null);
   const [isCreating, setIsCreating] = useState(false);
   const [notes, setNotes] = useState<
     Database["public"]["Tables"]["note"]["Row"][]
-  >([]);
+  >([]);  
 
   const [search, setSearch] = useState("");
 
