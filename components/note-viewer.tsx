@@ -1,16 +1,43 @@
 "use client";
+
+import { supabase } from "@/utils/supabase";
 import { useEffect, useState } from "react";
 
-export default function NoteViewer({ note }) {
+export default function NoteViewer({ note,setActiveNoteId,fetchNotes }) {
   const [title, setTitle] = useState(note?.title);
   const [content, setContent] = useState(note?.content);
   const [isEditing, setIsEditing] = useState(false);
 
-  useEffect(()=>{
+  const onEdit = async () => {
+    const { data, error } = await supabase.from("note").update({
+      title,
+      content,
+    }).eq('id',note.id);
+
+    if(error){
+      alert(error.message);
+    }
+    
+    setIsEditing(false);
+    fetchNotes();
+  };
+  const onDetele = async () => {
+    const { data, error } = await supabase.from("note").delete().eq('id',note.id);
+
+    if(error){
+      alert(error.message);
+    }
+    
+    setActiveNoteId(null);
+    setIsEditing(false);
+    fetchNotes();
+  };
+
+  useEffect(() => {
     setTitle(note?.title);
     setContent(note?.content);
     setIsEditing(false);
-  },[note]);
+  }, [note]);
 
   return (
     <div className="w-2/3 p-2 gap-2 flex flex-col absolute top-0 bottom-0 right-0">
@@ -31,22 +58,24 @@ export default function NoteViewer({ note }) {
         </>
       ) : (
         <>
-          <h1
-            className="text-xl p-2 border-b border-gray-300"
-          >{title}</h1>
-          <p
-            className="text-lg p-2 grow"
-          >{content}</p>
+          <h1 className="text-xl p-2 border-b border-gray-300">{title}</h1>
+          <p className="text-lg p-2 grow">{content}</p>
         </>
       )}
 
       <div className="w-full flex justify-end gap-2">
         {isEditing ? (
           <>
-            <button className="p-2 rounded-full border-2 border-green-600 py-1 px-3 hover:bg-green-200 transition-all duration-300 ease-in-out">
+            <button
+              onClick={() => onEdit()}
+              className="p-2 rounded-full border-2 border-green-600 py-1 px-3 hover:bg-green-200 transition-all duration-300 ease-in-out"
+            >
               저장
             </button>
-            <button className="p-2 rounded-full border-2 border-red-600 py-1 px-3 hover:bg-red-200 transition-all duration-300 ease-in-out">
+            <button
+              onClick={() => onDetele()}
+              className="p-2 rounded-full border-2 border-red-600 py-1 px-3 hover:bg-red-200 transition-all duration-300 ease-in-out"
+            >
               삭제
             </button>
           </>

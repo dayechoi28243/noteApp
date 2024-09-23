@@ -1,13 +1,30 @@
 "use client";
+import { supabase } from "@/utils/supabase";
 import { useState } from "react";
 
-export default function NewNote({setIsCreating}) {
+export default function NewNote({ setIsCreating,fetchNotes,setActiveNoteId }) {
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
 
   const onSave = async () => {
-    setIsCreating(false)
-  }
+    if (!title || !content) {
+      alert('제목과 내용을 입력해주세요');
+      return;
+    }
+
+    const { data, error } = await supabase.from("note").insert({
+      title,
+      content,
+    }).select();
+
+    if(error){
+      alert(error.message);
+    }
+
+    await fetchNotes();
+    setActiveNoteId((data as any[])[0].id)
+    setIsCreating(false);
+  };
 
   return (
     <div className="w-2/3 p-2 gap-2 flex flex-col absolute top-0 bottom-0 right-0">
@@ -25,8 +42,13 @@ export default function NewNote({setIsCreating}) {
       />
       <div className="w-full flex justify-end">
         <button
-        onClick={()=>{onSave()}}
-        className="p-2 rounded-full border-2 border-green-600 py-1 px-3 hover:bg-green-200 transition-all duration-300 ease-in-out">저장</button>
+          onClick={() => {
+            onSave();
+          }}
+          className="p-2 rounded-full border-2 border-green-600 py-1 px-3 hover:bg-green-200 transition-all duration-300 ease-in-out"
+        >
+          저장
+        </button>
       </div>
     </div>
   );
